@@ -143,7 +143,7 @@ public class SearchServiceImpl implements SearchService {
 
 
 
-        Pageable pageable = PageRequest.of(page, size, sortField);
+        Pageable pageable = PageRequest.of(page-1, size, sortField);
 
         NativeQuery nativeQuery = NativeQuery.builder()
                 .withQuery(fn -> fn.bool(bool.build()))
