@@ -1,3 +1,7 @@
 spring:
     application:
           name: elasticsearch-assignment
+
+    data:
+      elasticsearch:
+         cluster-node: ${cluster-node}
