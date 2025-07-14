@@ -1,11 +1,10 @@
 package com.example.elasticsearch_assignment.entity;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Document(indexName = "courses")
 public class CourseDocument {
@@ -13,10 +12,20 @@ public class CourseDocument {
     @Id
     private int id;
 
-    @Field(type = FieldType.Text)
+    @MultiField(
+            mainField = @Field(type = FieldType.Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
     private String title;
 
-    @Field(type = FieldType.Text)
+    @MultiField(
+            mainField = @Field(type = FieldType.Text),
+            otherFields = {
+                    @InnerField(suffix = "keyword", type = FieldType.Keyword)
+            }
+    )
     private String description;
 
     @Field(type = FieldType.Keyword)
@@ -37,8 +46,8 @@ public class CourseDocument {
     @Field(type = FieldType.Float)
     private float price;
 
-    @Field(type = FieldType.Date)
-    private LocalDateTime nextSessionDate;
+    @Field(type = FieldType.Date, format = DateFormat.date_time)
+    private OffsetDateTime nextSessionDate;
 
     public int getId() {
         return id;
@@ -112,11 +121,11 @@ public class CourseDocument {
         this.price = price;
     }
 
-    public LocalDateTime getNextSessionDate() {
+    public OffsetDateTime getNextSessionDate() {
         return nextSessionDate;
     }
 
-    public void setNextSessionDate(LocalDateTime nextSessionDate) {
+    public void setNextSessionDate(OffsetDateTime nextSessionDate) {
         this.nextSessionDate = nextSessionDate;
     }
 }
