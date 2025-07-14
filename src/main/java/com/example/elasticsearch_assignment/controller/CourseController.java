@@ -34,7 +34,7 @@ public class CourseController {
             @RequestParam(required = false) Float maxPrice,
             @RequestParam(required = false) OffsetDateTime startDate,
             @RequestParam(required = false, defaultValue = "nextSessionDate") String sort,
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size
     )
     {
