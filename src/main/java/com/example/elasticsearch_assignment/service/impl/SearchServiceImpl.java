@@ -1,7 +1,10 @@
 package com.example.elasticsearch_assignment.service.impl;
 
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.*;
 import com.example.elasticsearch_assignment.dto.response.CourseDocumentDto;
 import com.example.elasticsearch_assignment.entity.CourseDocument;
 import com.example.elasticsearch_assignment.exception.InvalidRequestParameterException;
@@ -11,12 +14,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.suggest.response.CompletionSuggestion;
+import org.springframework.data.elasticsearch.core.suggest.response.Suggest;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -25,11 +34,13 @@ public class SearchServiceImpl implements SearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final CourseMapper courseMapper;
+    private final ElasticsearchClient elasticsearchClient;
 
 
-    public SearchServiceImpl(ElasticsearchOperations elasticsearchOperations, CourseMapper courseMapper) {
+    public SearchServiceImpl(ElasticsearchOperations elasticsearchOperations, CourseMapper courseMapper, ElasticsearchClient elasticsearchClient) {
         this.elasticsearchOperations = elasticsearchOperations;
         this.courseMapper = courseMapper;
+        this.elasticsearchClient = elasticsearchClient;
     }
 
     @Override
@@ -56,7 +67,12 @@ public class SearchServiceImpl implements SearchService {
         }else {
             //Full-text search
             matchQuery = MultiMatchQuery.of(m ->
-                    m.fields("title", "description").query(query).type(TextQueryType.BestFields));
+                    m.fields("title", "description")
+                            .query(query)
+                            .fuzziness("AUTO") // Part of assignment B
+                            .type(TextQueryType.BestFields)
+            );
+
             bool.must(m -> m.multiMatch(matchQuery));
         }
 
@@ -158,6 +174,41 @@ public class SearchServiceImpl implements SearchService {
                 .map(courseMapper::toCourseDocumentDto) // mapping to dto
                 .toList();
 
+    }
+
+    @Override
+    public List<String> getSuggestion(String q){  // Part of assignment B
+
+
+            Suggester request = Suggester.of(s ->
+                    s.suggesters("suggest", sug ->
+                            sug.prefix(q)
+                                    .completion(c ->
+                                            c.field("suggest")
+                                                    .skipDuplicates(true)
+                                                    .size(10)
+                                    )
+                    )
+            );
+
+            NativeQuery nativeQuery = new NativeQueryBuilder()
+                    .withSuggester(request)
+                    .build();
+
+            SearchHits<CourseDocument> searchHits = elasticsearchOperations.search(nativeQuery, CourseDocument.class);
+            Suggest suggest = searchHits.getSuggest();
+
+            List<String> suggestions = new ArrayList<>();
+
+            if (suggest != null){
+                suggest.getSuggestion("suggest")
+                        .getEntries()
+                        .forEach(suggestion ->
+                                suggestion.getOptions().forEach(option -> suggestions.add(option.getText()))
+                        );
+            }
+
+            return suggestions;
     }
 
 
