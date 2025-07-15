@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.elasticsearch.core.suggest.Completion;
 import org.springframework.stereotype.Component;
 
 import java.io.FileNotFoundException;
@@ -40,6 +41,7 @@ public class DataListener implements CommandLineRunner {
         }
 
         List<CourseDocument> documentList = objectMapper.readValue(inputStream, typeReference);
+        documentList.forEach(course -> course.setSuggest(new Completion(List.of(course.getTitle()))));
         courseDocumentRepository.saveAll(documentList);
         LOGGER.info("Course details are indexed into Elasticsearch.");
     }
