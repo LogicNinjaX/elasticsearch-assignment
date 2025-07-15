@@ -2,6 +2,7 @@ package com.example.elasticsearch_assignment.entity;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
+import org.springframework.data.elasticsearch.core.suggest.Completion;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -48,6 +49,9 @@ public class CourseDocument {
 
     @Field(type = FieldType.Date, format = DateFormat.date_time)
     private OffsetDateTime nextSessionDate;
+
+    @CompletionField(maxInputLength = 100)
+    private Completion suggest;  // Part of assignment B
 
     public int getId() {
         return id;
@@ -127,5 +131,13 @@ public class CourseDocument {
 
     public void setNextSessionDate(OffsetDateTime nextSessionDate) {
         this.nextSessionDate = nextSessionDate;
+    }
+
+    public Completion getSuggest() {
+        return suggest;
+    }
+
+    public void setSuggest(Completion suggest) {
+        this.suggest = suggest;
     }
 }
