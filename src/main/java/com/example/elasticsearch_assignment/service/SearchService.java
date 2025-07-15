@@ -20,4 +20,6 @@ public interface SearchService {
             int page,
             int size
     );
+
+    List<String> getSuggestion(String q);
 }
