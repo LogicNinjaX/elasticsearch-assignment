@@ -1,6 +1,6 @@
 #  Course Search Application – Spring Boot + Elasticsearch
 
-A Spring Boot application that indexes educational courses into Elasticsearch and provides a powerful search API with filters, sorting, and pagination.
+A Spring Boot application that indexes educational courses into Elasticsearch and provides a powerful search API with filters, sorting, and pagination, autocomplete auggestions, Fuzzy Search.
 
 ---
 
@@ -40,6 +40,7 @@ mvn spring-boot:run
 
 ---
 
+## Assignment A
 ## API Example – Search Courses
 
 ✅ Endpoint
@@ -156,6 +157,89 @@ Response
             "category": "Technology",
             "price": 56.53,
             "nextSessionDate": "2025-09-03T13:32:02.855Z"
+        }
+    ]
+}
+```
+---
+## Assignment B
+## API Example – Get Title Suggestions, Fuzzy Search
+
+✅ Endpoint
+```
+http://localhost:8080/api/search/suggest
+http://localhost:8080/api/search
+```
+### 🔧 Query Parameters
+
+| Parameter    | Type       | Required | Description                                      |
+|--------------|------------|----------|--------------------------------------------------|
+| `q`          | String     | ✅       | Provide partial title to get suggestions         |
+
+
+### 📥 Sample Requests
+
+## For Suggestions
+
+```bash
+GET /api/search/suggest?q=S
+```
+Response
+```json
+[
+    "Sound Engineering",
+    "Space Exploration",
+    "Statistics with Fun",
+    "Storytime Reading"
+]
+```
+---
+```bash
+GET /api/search/suggest?q=St
+```
+Response
+```json
+[
+    "Statistics with Fun",
+    "Storytime Reading"
+]
+```
+
+## For Fuzzy Search
+
+```bash
+GET /api/search?q=Mathematics&size=1
+```
+Response
+```json
+{
+    "total": 1,
+    "courses": [
+        {
+            "id": 29,
+            "title": "Mathematical Thinking",
+            "category": "Music",
+            "price": 102.2,
+            "nextSessionDate": "2025-08-22T13:32:02.855Z"
+        }
+    ]
+}
+```
+---
+```bash
+GET /api/search?q=Robots&size=1
+```
+Response
+```json
+{
+    "total": 1,
+    "courses": [
+        {
+            "id": 41,
+            "title": "Robotics 101",
+            "category": "Science",
+            "price": 42.21,
+            "nextSessionDate": "2025-08-03T13:32:02.855Z"
         }
     ]
 }
