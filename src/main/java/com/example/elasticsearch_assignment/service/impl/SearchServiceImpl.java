@@ -34,13 +34,11 @@ public class SearchServiceImpl implements SearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final CourseMapper courseMapper;
-    private final ElasticsearchClient elasticsearchClient;
 
 
-    public SearchServiceImpl(ElasticsearchOperations elasticsearchOperations, CourseMapper courseMapper, ElasticsearchClient elasticsearchClient) {
+    public SearchServiceImpl(ElasticsearchOperations elasticsearchOperations, CourseMapper courseMapper) {
         this.elasticsearchOperations = elasticsearchOperations;
         this.courseMapper = courseMapper;
-        this.elasticsearchClient = elasticsearchClient;
     }
 
     @Override
