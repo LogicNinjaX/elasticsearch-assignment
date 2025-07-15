@@ -54,4 +54,10 @@ public class CourseController {
 
         return ResponseEntity.ok(new SearchResponseDto(documentList.size(), documentList));
     }
+
+
+    @GetMapping("/search/suggest")
+    public List<String> getS(@RequestParam String q){
+        return service.getSuggestion(q);
+    }
 }
